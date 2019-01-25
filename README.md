@@ -1,5 +1,7 @@
 __平台链官网api及后台管理__
 
+平台官网访问地址:www.udo.link
+
 本系统采用beego框架，在运行前需要安装golang环境；
 
 1. 安装go环境（linux）
