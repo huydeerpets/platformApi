@@ -42,7 +42,7 @@ __平台链官网api及后台管理__
 
     cd $GOPATH/src
 
-    git clone http://192.168.1.230/timeShuttle/platformApi.git
+    git clone https://github.com/m-chain/platformApi.git
 
     cd platformApi
 

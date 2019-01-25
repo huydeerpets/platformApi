@@ -6,7 +6,6 @@ import (
 	"platformApi/src/common"
 	"platformApi/src/model"
 	"platformApi/src/service"
-
 )
 
 // 链相关操作
@@ -36,6 +35,7 @@ type ChainController struct {
 // @Success 200 {object} model.JsonResult
 // @router /chainApply [post]
 func (o *ChainController) ChainApply() {
+
 	name := o.GetString("name", "")
 	en_short := o.GetString("en_short", "")
 	remark := o.GetString("remark", "")
