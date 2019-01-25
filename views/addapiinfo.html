@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>API信息</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+
+    <!--  IE10 viewport hack for Surface/desktop Windows 8 bug-->
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="/static/js/ie/html5shiv.js"></script>
+    <script src="/static/js/ie/respond.js"></script>
+    <![endif]-->
+    <style type="text/css">
+        .tab-close {
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">接口信息</h4>
+            </div>
+            <div class="panel-body">
+                <form id="updateform" class="form-horizontal">
+                    <input type="hidden" id="pid" name="pid" value="{{.cate.Id}}" />
+                    <input type="hidden" id="full_path" name="full_path" value="{{.cate.FullPath}}" />
+                    <input type="hidden" id="depth" name="depth" value="{{.cate.Depth}}" />
+                    <input type="hidden" id="subCount" name="subCount" value="{{.subCount}}" />
+                    <input type="hidden" id="nodeLevel" name="nodeLevel" value="{{.nodeLevel}}" />
+                    <input type="hidden" id="langType" name="langType" value="{{.langType}}" />
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>接口名称:</label>
+                        <div class="col-sm-4 col-xs-4">
+                            <input type="text" class="form-control" id="name" name="name" value="{{.cate.Name}}">
+                        </div>
+                        <label for="method" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>请求方法:
+                        </label>
+                        <div class="col-sm-4 col-xs-4">
+                            <select id="method" name="method" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="request_url" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>请求url:
+                        </label>
+                        <div class="col-sm-10 col-xs-10">
+                            <input type="text" class="form-control" id="request_url" name="request_url" value="{{.cate.RequestUrl}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="remark" class="col-sm-2 col-xs-2 control-label text-right">
+                            描述:
+                        </label>
+                        <div class="col-sm-10 col-xs-10">
+                            <textarea style="resize:none;height:120px;" class="form-control" id="remark" name="remark">{{.cate.Remark}}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <button id="submitBtn" type="button" style="display:none;">确定</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">请求部分</h4>
+            </div>
+            <div class="panel-body">
+                <form id="paramsForm" class="form-horizontal">
+        
+                    <table id="paramTable" class="table table-bordered text-center">
+                        <caption class="text-right"><button type="button" class="btn btn-xs btn-primary" onclick="addRow()">添加</button></caption>
+                        <thead>
+                            <tr>
+                                <th style="width:20%;text-align: center;">参数名称</th>
+                                <th style="width:15%;text-align: center;">参数类型</th>
+                                <th style="width:15%;text-align: center;">数据类型</th>
+                                <th style="width:15%;text-align: center;">是否必填</th>
+                                <th style="width:20%;text-align: center;">描述</th>
+                                <th style="width:15%;text-align: center;">删除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <!--form-group start-->
+                    <div class="form-group">                  
+                        <div class="container-fluid">
+                            <!-- field start -->
+                            <div class="row qb-content-wrapper qb-main-content">
+                                <div class="col-md-12 col-xs-12">
+                                    <ul id="req_field_ul" class="nav nav-tabs tabs" role="tablist">
+                                        <li role="presentation" class="tab-list">
+                                            <a href="javascript:void(0);" onclick="addReqField(this)">
+                                                <i class="fa fa-plus tab-close"></i>添加参数说明
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div id="req_field_content" class="tab-content">
+                    
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- field end -->
+                        </div>
+                    </div>
+                    <!--form-group end-->
+
+                    <!--form-data start-->
+                    <div class="form-group">
+                        <div class="container-fluid">
+                            <div class="row" style="height:38px;line-height:38px;text-align:center;background-color: #f8f8f8;border:1px solid #ddd;">
+                                <div class="col-md-12 col-xs-12 text-center">表单构造参数</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-xs-12 text-center">
+                                    <table id="formDataTable" class="table table-bordered text-center">
+                                        <caption class="text-right"><button type="button" class="btn btn-xs btn-primary" onclick="addFormRow()">添加</button></caption>
+                                        <thead>
+                                            <tr>
+                                                <th style="width:20%;text-align: center;">数据名称</th>
+                                                <th style="width:15%;text-align: center;">数据类型</th>
+                                                <th style="width:15%;text-align: center;">是否必填</th>
+                                                <th style="width:30%;text-align: center;">描述</th>
+                                                <th style="width:15%;text-align: center;">删除</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--form-data start-->
+
+                    <!--form-group start-->
+                    <div class="form-group">
+
+                        <div class="container-fluid">
+                            <!-- sample start -->
+                            <div class="row qb-content-wrapper qb-main-content">
+                                <div class="col-md-12 col-xs-12">
+                                    <ul id="sample_ul" class="nav nav-tabs tabs" role="tablist">
+                                        <li role="presentation" class="tab-list">
+                                            <a href="javascript:void(0);" onclick="addReqSample(this)">
+                                                <i class="fa fa-plus tab-close"></i>添加请求实例
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div id="sample_content" class="tab-content">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- sample end -->
+                            <!-- code start -->
+                            <div class="row qb-content-wrapper qb-main-content">
+                                <div class="col-md-12 col-xs-12">
+                                    <ul id="code_ul" class="nav nav-tabs tabs" role="tablist">
+                                        <li role="presentation" class="tab-list">
+                                            <a href="javascript:void(0);" onclick="addReqCode(this)">
+                                                <i class="fa fa-plus tab-close"></i>添加实例代码
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div id="code_content" class="tab-content">
+                            
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- code end -->
+                        </div>
+
+                    </div>
+                    <!--form-group end-->
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">响应部分</h4>
+            </div>
+            <div class="panel-body">
+                <form id="respForm" class="form-horizontal">
+        
+                    <table id="respTable" class="table table-bordered text-center">
+                        <caption class="text-right"><button type="button" class="btn btn-xs btn-primary" onclick="addRespRow('respTable')">添加</button>&nbsp;&nbsp;<button type="button" class="btn btn-xs btn-default" onclick="impText(this)">导入</button></caption>
+                        <thead>
+                            <tr>
+                                <th style="width:25%;text-align: center;">名称</th>
+                                <th style="width:20%;text-align: center;">类型</th>
+                                <th style="width:30%;text-align: center;">描述</th>
+                                <th style="width:25%;text-align: center;">删除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <!--form-group start-->
+                    <div class="form-group">
+        
+                        <div class="container-fluid">
+                            <!-- sample start -->
+                            <div class="row qb-content-wrapper qb-main-content">
+                                <div class="col-md-12 col-xs-12">
+                                    <ul id="resp_ul" class="nav nav-tabs tabs" role="tablist">
+                                        <li role="presentation" class="tab-list active">
+                                            <input type="hidden" id="respSampleId0" name="respSampleId0" value="0">
+                                            <input type="hidden" class="respTypeClass" id="respType0" name="respType0" value="1">
+                                            <a href="#resp_result0" aria-controls="resp_result0" role="tab" data-toggle="tab">成功实例</a>
+                                        </li>
+                                        <li role="presentation" class="tab-list">
+                                            <input type="hidden" id="respSampleId1" name="respSampleId1" value="0">
+                                            <input type="hidden" class="respTypeClass" id="respType1" name="respType1" value="2">
+                                            <a href="#resp_result1" aria-controls="resp_result1" role="tab" data-toggle="tab">失败实例</a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div id="resp_content" class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="resp_result0">
+                                            <textarea style="resize:none;height:200px;" class="form-control" id="resp_sample0" name="resp_sample0"></textarea>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="resp_result1">
+                                            <textarea style="resize:none;height:200px;" class="form-control" id="resp_sample1" name="resp_sample1"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <!-- sample end -->
+                        </div>
+        
+                    </div>
+                    <!--form-group end-->
+                </form>
+            </div>
+        </div>
+
+        <!-- 计算语言 -->
+        <div id="computer_lang" style="display: none;">
+            <select id="lang_type" name="lang_type" class="form-control" style="margin-left:25px;width:300px;">
+            </select>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/layer/layer.js"></script>
+    <script src="/static/js/json2.js"></script>
+    <script src="/static/js/utf8.js"></script>
+    <script type="text/javascript" src="/static/js/util.js"></script>
+    <script src="/static/js/service/apiManager.js?v=1.1.1"></script>
+    <script type="text/javascript">
+        var deleteReqFieldIds = ",";
+        var deleteReqFieldItemIds = ",";
+
+        setFieldTabEvent();
+
+        function setSubmitBtnEvent() {
+            $("#submitBtn").click(function () {
+                var pid = $("#pid").val();
+                var full_path = $("#full_path").val();
+                var depth = $("#depth").val();
+                var subCount = $("#subCount").val();
+
+                var name = $("#name").val();
+                var method = $("#method").val();
+                var request_url = $("#request_url").val();
+                var remark = $("#remark").val();
+                remark = remark.replace(/\n|\r\n/g, "<br>");
+
+                if (name == "") {
+                    showTips("接口名称不能为空！", "name");
+                    return;
+                }
+
+                if (method == "") {
+                    showTips("请求方法不能为空！", "method");
+                    return;
+                }
+
+                if (request_url == "") {
+                    showTips("请求url不能为空！", "request_url");
+                    return;
+                }
+
+                //处理请求参数
+                var trArr = $("#paramTable>tbody").find("tr");
+                var paramItems = [];
+                for (var i = 0; i < trArr.length; i++) {
+                    var argName = $(trArr[i]).find("#arg_name" + i).val();
+                    if (argName && argName != "") {
+                        var tdArr = $(trArr[i]).find("td");
+                        var item = {};
+                        for (var j = 0; j < (tdArr.length - 1); j++) {
+                            var obj = $(tdArr[j]).find(":input");
+                            if ($(obj).val() == "") {
+                                $(obj).css("background", "pink");
+                                var tips = "第" + (i + 1) + "行中的【" + titles[j] + "】不能为空!"
+                                showTips(tips, $(obj).attr("id"));
+                                return;
+                            }
+                            var key = $(obj).attr("name").replace(/\d+/g, '')
+                            item[key] = $(obj).val()
+
+                            if (j == (tdArr.length - 2)) {//last
+                                item["id"] = parseInt($(trArr[i]).find("#id" + i).val());
+                            }
+                        }
+                        item["order_num"] = i;//排序号
+                        paramItems.push(item);
+                    }
+                }
+
+                //处理请求参数说明
+                var fieldData = [];
+                var liArr = $("#req_field_ul").find("li");
+                for (var i = 0; i < liArr.length - 1; i++) {
+                    var fieldId = $(liArr[i]).find("#reqFieldId" + i).val();
+                    fieldId = parseInt(fieldId);
+                    var title = $(liArr[i]).find("a").text();
+
+                    var tableId = $("#req_field_content").find("table[id='req_field_table"+i+"']").attr("id");
+                    var trs = $("#"+tableId+">tbody").find("tr");
+                    var items = [];
+                    for(var r = 0;r < trs.length;r ++) {
+                        var id = $(trs[r]).find("input[id='id"+r+"']").val();
+                        var data_name = $(trs[r]).find("input[id='data_name" + r + "']").val();
+                        var typeObj = $(trs[r]).find("select[id='data_type" + r + "']");
+                        var requireObj = $(trs[r]).find("select[id='is_require" + r + "']");
+                        var descObj = $(trs[r]).find("input[id='description" + r + "']");
+
+                        if(data_name != "") {
+                            if ($(typeObj).val() == "") {
+                                $(typeObj).css("background", "pink");
+                                var tips = "第" + (r + 1) + "行中的【数据类型】不能为空!"
+                                layer.msg(tips);
+                                return;
+                            }
+                            if ($(requireObj).val() == "") {
+                                $(requireObj).css("background", "pink");
+                                var tips = "第" + (r + 1) + "行中的【是否必选】不能为空!"
+                                layer.msg(tips);
+                                return;
+                            }
+                            if ($(descObj).val() == "") {
+                                $(descObj).css("background", "pink");
+                                var tips = "第" + (r + 1) + "行中的【描述】不能为空!"
+                                layer.msg(tips);
+                                return;
+                            }
+                        }
+                        
+                        var item = {
+                            id:parseInt(id),
+                            data_name: data_name,
+                            data_type: $(typeObj).val(),
+                            is_require: $(requireObj).val(),
+                            description: $(descObj).val(),
+                            status:1,
+                            order_num:r
+                        };
+                        items.push(item);
+                    }
+                    
+                    if (title != "" && items.length > 0) {
+                        var reqFiled = {
+                            id: fieldId,
+                            title: title
+                        };
+                        fieldData.push({ reqFiled: reqFiled, items: items });
+                    }
+                }
+                //处理表单构造参数
+                var trArr = $("#formDataTable>tbody").find("tr");
+                var formDataItems = [];
+                for (var i = 0; i < trArr.length; i++) {
+                    var dataName = $(trArr[i]).find("#data_name" + i).val();
+                    if (dataName && dataName != "") {
+                        var tdArr = $(trArr[i]).find("td");
+                        var item = {};
+                        for (var j = 0; j < (tdArr.length - 1); j++) {
+                            var obj = $(tdArr[j]).find(":input");
+                            if ($(obj).val() == "") {
+                                $(obj).css("background", "pink");
+                                var tips = "第" + (i + 1) + "行中的【" + formTitles[j] + "】不能为空!"
+                                showTips(tips, $(obj).attr("id"));
+                                return;
+                            }
+                            var key = $(obj).attr("name").replace(/\d+/g, '')
+                            item[key] = $(obj).val()
+
+                            if (j == (tdArr.length - 2)) {//last
+                                item["id"] = parseInt($(trArr[i]).find("#id" + i).val());
+                            }
+                        }
+                        item["order_num"] = i;//排序号
+                        formDataItems.push(item);
+                    }
+                }
+
+                //处理请求实例
+                var reqSamples = [];
+                var liArr = $("#sample_ul").find("li");
+                for (var i = 0; i < liArr.length - 1; i++) {
+                    var id = $(liArr[i]).find("#reqSampleId" + i).val();
+                    id = parseInt(id);
+                    var sampleTitle = $(liArr[i]).find("a").text();
+                    var sampleCode = $("#sample_content").find("#req_sample" + i).val();
+                    if (sampleTitle != "" && sampleCode != "") {
+                        sampleCode = escape(sampleCode);
+                        reqSamples.push({ id: id, title: sampleTitle, content: sampleCode });
+                    }
+                }
+
+                var reqCodes = [];
+                var liArr = $("#code_ul").find("li");
+                for (var i = 0; i < liArr.length - 1; i++) {
+                    var id = $(liArr[i]).find("#reqCodeId" + i).val();
+                    id = parseInt(id);
+                    var langType = $(liArr[i]).find("#langType" + i).val();
+                    var content = $("#code_content").find("#req_code" + i).val();
+                    if (langType != "" && content != "") {
+                        content = escape(content);
+                        reqCodes.push({ id: id, langType: langType, content: content });
+                    }
+                }
+
+                var respSamples = [];
+                var liArr = $("#resp_ul").find("li");
+                for (var i = 0; i < liArr.length; i++) {
+                    var id = $(liArr[i]).find("#respSampleId" + i).val();
+                    id = parseInt(id);
+                    var respType = $(liArr[i]).find("#respType" + i).val();
+                    var content = $("#resp_content").find("#resp_sample" + i).val();
+                    if (respType != "" && content != "") {
+                        content = escape(content);
+                        respSamples.push({ id: id, respType: respType, content: content });
+                    }
+                }
+
+                //解析响应数据
+                var respItems = [];
+                parseRespTable('respTable', respItems);
+
+                for (var i = 0; i < respItems.length; i++) {
+                    if (respItems[i]["msg"]) {
+                        layer.msg(respItems[i]["msg"]);
+                        return;
+                    }
+                }
+                
+                var sendData = {
+                    pid: pid,
+                    full_path: full_path,
+                    depth: depth,
+                    subCount: subCount,
+                    name: name,
+                    method: method,
+                    request_url: request_url,
+                    remark: remark,
+                    deleteIds: deleteIds,
+                    deleteReqSampleIds: deleteReqSampleIds,
+                    deleteReqCodeIds: deleteReqCodeIds,
+                    deleteReqFieldIds: deleteReqFieldIds,
+                    deleteReqFieldItemIds: deleteReqFieldItemIds,
+                    params: paramItems,
+                    reqSamples: reqSamples,
+                    reqCodes: reqCodes,
+                    deleteFormDataIds: deleteFormDataIds,
+                    formDatas: formDataItems,
+                    respSamples: respSamples,
+                    respItems: respItems,
+                    fieldData: fieldData
+                };
+                console.log(sendData);
+
+                var url = '/ApiCategory/SaveApiInfo';
+                if ($("#nodeLevel").val() == '4') {
+                    url = '/ApiCategory/UpdateApiInfo';
+                }
+                var jsonStr = JSON.stringify(sendData);
+                var hexStr = String2Hex(utf8.encode(jsonStr));
+                console.log(jsonStr);
+                //发送ajax请求
+                $.ajax({
+                    url: url,
+                    async: false,//同步，会阻塞操作
+                    type: 'POST',//PUT DELETE POST
+                    data: { rawData: hexStr },
+                    success: function (result) {
+                        if (result.Status == 0) {
+                            var index = parent.layer.getFrameIndex(window.name);
+
+                            var iframe = $(window.parent.document).find("iframe[name='iframe2']")[0];
+                            if ($("#nodeLevel").val() == '4') {
+                                iframe.contentWindow.setItemName($("#pid").val(), $("#name").val());
+                            } else {
+                                iframe.contentWindow.addNewItemExt($("#pid").val(), result.Data, $("#name").val());
+                            }
+                            //1：勾号 2：X号 3：？号  4：锁  5：哭脸 6：笑脸 7：！号
+                            top.layer.msg('保存成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                            parent.layer.close(index);
+                        } else {
+                            top.layer.alert(result.Msg);
+                        }
+                    }, error: function () {
+                        top.layer.alert("网络异常，保存失败!");
+                    }
+                })
+            });
+        }
+
+        function loadRequestParams() {
+            var id = $("#pid").val();
+            $.ajax({
+                url: '/ApiCategory/GetApiRequestInfo/' + id + "?rand=" + Math.random(),
+                async: false,//同步，会阻塞操作
+                type: 'GET',//PUT DELETE POST
+                success: function (result) {
+                    console.log(result)
+                    if (result.Status == 0) {
+                        var requestParams = result.Data.requestParams;
+                        var formDatas = result.Data.formDatas;
+                        var requestSamples = result.Data.requestSamples;
+                        var requestCodes = result.Data.requestCodes;
+                        var respSamples = result.Data.respSamples;
+                        var respItems = result.Data.respItems;
+                        var fieldData = result.Data.fieldData;
+
+                        // 请求参数
+                        if (requestParams) {
+                            for (var i = 0; i < requestParams.length; i++) {
+                                var item = requestParams[i];
+                                addRow();
+                                $("#paramTable").find("#arg_name" + i).val(item.arg_name);
+                                $("#paramTable").find("#arg_type" + i).val(item.arg_type);
+                                $("#paramTable").find("#data_type" + i).val(item.data_type);
+                                $("#paramTable").find("#is_require" + i).val(item.is_require);
+                                $("#paramTable").find("#description" + i).val(item.description);
+                                $("#paramTable").find("#id" + i).val(item.id);
+                            }
+                        }
+
+                        if (fieldData) {
+                            initReqFieldData(fieldData);
+                        }
+                        // 表单构造参数
+                        if (formDatas) {
+                            for (var i = 0; i < formDatas.length; i++) {
+                                var item = formDatas[i];
+                                addFormRow();
+                                $("#formDataTable").find("#data_name" + i).val(item.data_name);
+                                $("#formDataTable").find("#data_type" + i).val(item.data_type);
+                                $("#formDataTable").find("#is_require" + i).val(item.is_require);
+                                $("#formDataTable").find("#description" + i).val(item.description);
+                                $("#formDataTable").find("#id" + i).val(item.id);
+                            }
+                        }
+
+                        // 请求实例
+                        if (requestSamples) {
+                            for (var i = 0; i < requestSamples.length; i++) {
+                                var item = requestSamples[i];
+                                insertReqSampleRow(i, item.title);
+                                $("#sample_ul").find("#reqSampleId" + i).val(item.id);
+                                $("#sample_content").find("#req_sample" + i).val(unescape(item.content));
+                            }
+                        }
+
+                        //实例代码
+                        var langMap = {};
+                        for (var key in typeData) {
+                            if (key == "comp_lang") {
+                                var arr = typeData[key];
+                                for (var i = 0; i < arr.length; i++) {
+                                    var code = arr[i].data_code;
+                                    var name = arr[i].data_name;
+                                    langMap[code] = name;
+                                }
+                                break;
+                            }
+                        }
+                        if (requestCodes) {
+                            for (var i = 0; i < requestCodes.length; i++) {
+                                var item = requestCodes[i];
+                                insertReqCodeRow(i, item.langType, langMap[item.langType]);
+                                $("#code_ul").find("#reqCodeId" + i).val(item.id);
+                                $("#code_content").find("#req_code" + i).val(unescape(item.content));
+                            }
+                        }
+                        //响应实例
+                        if (respSamples) {
+                            for (var i = 0; i < respSamples.length; i++) {
+                                var item = respSamples[i];
+                                $("#resp_ul").find("#respSampleId" + i).val(item.id);
+                                $("#resp_ul").find("#respType" + i).val(item.respType);
+                                $("#resp_content").find("#resp_sample" + i).val(unescape(item.content));
+                            }
+                        }
+
+                        //响应对象数据
+                        if (respItems) {
+                            doWithRespParams(respItems, 'respTable', 0);
+                        }
+                    }
+                }, error: function () {
+                }
+            });
+        }
+
+        function initReqFieldData(fieldData) {
+            for (var i = 0; i < fieldData.length; i++) {
+                var dataItem = fieldData[i];
+                insertReqFieldRow(i, dataItem.reqFiled.title);
+                $("#req_field_ul").find("#reqFieldId" + i).val(dataItem.reqFiled.id);
+                var tableId = $("#req_field_content").find("#req_field_table" + i).attr("id");
+                
+                var items = dataItem.items;
+                var btnObj = $("#" + tableId + ">caption").find("button");
+                for(var j = 0;j < items.length;j ++) {
+                    addFieldRow(btnObj);
+                    var trObj = $("#" + tableId + ">tbody").find("tr")[j];
+                    $(trObj).find(":input[id='id"+j+"']").val(items[j].id);
+                    $(trObj).find(":input[id='data_name" + j + "']").val(items[j].data_name);
+                    $(trObj).find("select[id='data_type" + j + "']").val(items[j].data_type);
+                    $(trObj).find("select[id='is_require" + j + "']").val(items[j].is_require);
+                    $(trObj).find(":input[id='description" + j + "']").val(items[j].description);
+                }
+            }
+        }
+        function addReqField(obj) {
+            var len = $("#req_field_ul").find("li").length - 1;
+            layer.prompt({
+                title: '请输入对哪一请求参数的说明',
+                formType: 0,
+                value: '',
+                btn: ["确定", "取消"]
+            }, function (text, index) {
+                if (text && text != "") {
+                    insertReqFieldRow(len, text);
+                    layer.close(index);
+                };
+            });
+        }
+
+        function insertReqFieldRow(i, name) {
+            var id = "reqField" + i;
+            var navItemHtml = '<li role="presentation" class="tab-list">' +
+                '<input type="hidden" id="reqFieldId' + i + '" name="reqFieldId' + i + '" value="0">' +
+                '<a href="#' + id + '" aria-controls="' + id + '" role="tab" data-toggle="tab">' + name +
+                '<i class="fa fa-remove tab-close"></i></a>' +
+                '</li>';
+            $("#req_field_ul").find("li:last").before(navItemHtml);
+            $("#req_field_ul").find("li").removeClass("active");
+            $("#req_field_ul").find("li:last").prev().addClass("active");
+
+            var tabelHtml = '<table id="req_field_table' + i + '" class="table table-bordered text-center">'+
+                '<caption class="text-right"> <button type="button" class="btn btn-xs btn-primary" onclick="addFieldRow(this)">添加</button></caption>'+
+                     '<thead> '+
+                        '<tr> '+
+                            '<th style="width:20%;text-align: center;">数据名称</th> '+
+                            '<th style="width:15%;text-align: center;">数据类型</th> '+
+                            '<th style="width:15%;text-align: center;">是否必填</th> '+
+                            '<th style="width:30%;text-align: center;">描述</th> '+
+                            '<th style="width:15%;text-align: center;">删除</th> '+
+                        '</tr> '+
+                    '</thead> '+
+                    '<tbody> '+
+                    '</tbody> '+
+                '</table>';
+
+            var contentHtml = '<div role="tabpanel" class="tab-pane" id="' + id + '">' + tabelHtml +'</div >';
+
+            $("#req_field_content").append(contentHtml);
+            $("#req_field_content").find(".tab-pane").removeClass("active");
+            $("#req_field_content").find(".tab-pane:last").addClass("active");
+        }
+
+        function addFieldRow(btnObj) {
+            var tableObj = $(btnObj).parent().parent();
+            var tableId = $(tableObj).attr("id");
+            var len = $("#"+ tableId +">tbody").find("tr").length;
+
+            var trHtml = '<tr>' +
+                '<td><input type="text" class="form-control" id="data_name' + len + '" name="data_name' + len + '"></td>' +
+                '<td><select type="text" class="form-control data-type" id="data_type' + len + '" name="data_type' + len + '"><option value="">-=请选择=-</option></select></td>' +
+                '<td><select type="text" class="form-control is-require" id="is_require' + len + '" name="is_require' + len + '"><option value="1">是</option><option value="2">否</option></select></td>' +
+                '<td><input type="text" class="form-control" id="description' + len + '" name="description' + len + '"></td>' +
+                '<td><button type="button" class="btn btn-xs btn-danger" onclick="deleteFieldItemRow(this)">删除</button><input type="hidden" id="id' + len + '" name="id' + len + '" value=0></td>' +
+                '</tr>';
+            $("#" + tableId +">tbody").append(trHtml);
+            setSelectValue(len, tableId, 'data_type');
+        }
+
+        function deleteFieldItemRow(obj) {
+            var id = $(obj).next().val();
+            if (deleteReqFieldItemIds.indexOf("," + id + ",") == -1) {
+                deleteReqFieldItemIds += id + ",";
+            }
+            var trObj = $(obj).parent().parent();
+            var rowIndex = $(trObj).index();
+            var trs = $(trObj).parent().children();//tbody>tr
+            for(var i = (rowIndex+1);i < trs.length;i++) {
+                var idx = (i-1);
+                $(trs[i]).find(":input[id='id" + i + "']").attr("name", "id" + idx);
+                $(trs[i]).find(":input[id='data_name" + i + "']").attr("name", "data_name" + idx);
+                $(trs[i]).find("select[id='data_type" + i + "']").attr("name", "data_type" + idx);
+                $(trs[i]).find("select[id='is_require" + i + "']").attr("name", "is_require" + idx);
+                $(trs[i]).find(":input[id='description" + i + "']").attr("name", "description" + idx);
+
+                $(trs[i]).find(":input[id='id" + i + "']").attr("id","id"+ idx);
+                $(trs[i]).find(":input[id='data_name" + i + "']").attr("id", "data_name" + idx);
+                $(trs[i]).find("select[id='data_type" + i + "']").attr("id", "data_type" + idx);
+                $(trs[i]).find("select[id='is_require" + i + "']").attr("id", "is_require" + idx);
+                $(trs[i]).find(":input[id='description" + i + "']").attr("id", "description" + idx);
+            }
+            $(trObj).remove();
+        }
+
+        function setFieldTabEvent() {
+            $("#req_field_ul").on('click', '.tab-close', function (ev) {
+                var ev = window.event || ev;
+                ev.stopPropagation();
+                //先判断当前要关闭的tab选项卡有没有active类，再判断当前选项卡是否最后一个，如果是则给前一个选项卡以及内容添加active，否则给下一个添加active类
+                var len = $("#req_field_ul").find("li").length;
+                var liObj = $(this).parent().parent();
+                var aObj = $(this).parent();
+                if (liObj.hasClass('active')) {
+                    if (liObj.index() == len - 2) {
+                        liObj.prev().addClass('active');
+                        $(aObj.attr('href')).prev().addClass('active');
+                    } else {
+                        liObj.next().addClass('active');
+                        $(aObj.attr('href')).next().addClass('active');
+                    }
+                }
+
+                var id = $(liObj).find("#reqFieldId" + liObj.index()).val();
+                if (deleteReqFieldIds.indexOf("," + id + ",") == -1) {
+                    deleteReqFieldIds += id + ",";
+                }
+
+                liObj.remove();
+                $(aObj.attr('href')).remove();
+
+                //重新设置
+                var liArr = $("#req_field_ul").find("li");
+                var contentArr = $("#req_field_content").find(".tab-pane");
+                len = liArr.length;
+                for (var i = 0; i < len - 1; i++) {
+                    var id = "reqField" + i;
+                    $(liArr[i]).find("a").attr("href", "#" + id);
+                    $(liArr[i]).find("a").attr("aria-controls", id);
+
+                    $(liArr[i]).find(":input").attr("name", "reqFieldId" + i);
+                    $(liArr[i]).find(":input").attr("id", "reqFieldId"+i);
+                    
+                    $(contentArr[i]).attr("id", id);
+
+                    $(contentArr[i]).find("table").attr("id", "req_field_table" + i);
+                }
+            });
+            //修改标题名称
+            $("#req_field_ul").on('dblclick', 'a', function (ev) {
+                var ev = window.event || ev;
+                ev.stopPropagation();
+                var that = this;
+                var name = $(that).text();
+                layer.prompt({
+                    title: '您可以对【' + name + '】重新命名',
+                    formType: 0,
+                    value: name,
+                    btn: ["确定", "取消"]
+                }, function (text, index) {
+                    if (text && text != "") {
+                        $(that).contents()[0].textContent = text;
+                        //$(that).text(text);
+                        layer.close(index);
+                    };
+                });
+
+            });
+        }
+
+        function setReqMethodSelectValue() {
+            for (var key in typeData) {
+                if (key == "request_method") {
+                    var arr = typeData[key];
+                    for (var idx in arr) {
+                        $("#method").append("<option value='" + arr[idx].data_code + "'>" + arr[idx].data_name + "</option>");
+                    }
+                    break;
+                }
+            }
+            var method = '{{.cate.Method}}';
+            if (method != "")
+                $("#method").val(method);
+        }
+
+        //去除注释
+        function removeAnnotation(value) {
+            var reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
+            value = value.replace(reg, function (word) {
+                // 去除注释后的文本 
+                return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? "" : word;
+            });
+            return value;
+        }
+
+        function getSelectValue(name) {
+            for (var key in typeData) {
+                if (key == "data_type") {
+                    var arr = typeData[key];
+                    for (var idx in arr) {
+                        if(arr[idx].data_name== name) {
+                            return arr[idx].data_code;
+                        }
+                    }
+                    break;
+                }
+            }
+            return "";
+        }
+
+        function impText(cObj){
+            layer.prompt({
+                formType: 2,
+                value: '',
+                title: '请输入json格式数据',
+                area: ['500px', '300px'],
+                maxlength: 4000
+            }, function (value, index, elem) {
+                if(value != "") {
+                    value = removeAnnotation(value);
+                    try {
+                        var obj = JSON.parse(value);
+                        if(!Array.isArray(obj)) {//不是数组对象
+                            var tableObj = $(cObj).parent().parent();
+                            var tableId = $(tableObj).attr("id");
+                            var newTables = [];
+                            for (var key in obj) {
+                                var typeName = (typeof obj[key]);
+                                if(typeName != 'object') {
+                                    //number string boolean
+                                    var item = {
+                                        id: 0,
+                                        parentId: 0,
+                                        data_name: key,
+                                        data_type: getSelectValue(typeName),
+                                        idx: 0,//核心
+                                        description:''
+                                    };
+                                    addRespRow(tableId, item);
+                                } else {//object,array
+                                    var dataType = "";
+                                    if(Array.isArray(obj[key])) {//array
+                                        dataType = getSelectValue('array');
+                                    } else {//object
+                                        dataType = getSelectValue('object');
+                                    }
+                                    var item = {
+                                        id: 0,
+                                        parentId: 0,
+                                        data_name: key,
+                                        data_type: dataType,
+                                        idx:0,
+                                        description: ''
+                                    };
+                                    newTables.push(item);
+                                }
+                            }
+                            for(var i =0;i < newTables.length;i++) {
+                                var itemObj = newTables[i];
+                                var rowIndex = addRespRow(tableId, itemObj);
+                                var newTableId = addRespChildTable(tableId, rowIndex);
+                                var newObj = obj[itemObj.data_name];
+                                for(var kk in newObj) {
+                                    var typeName = (typeof newObj[kk]);
+                                    var dataType = "";
+                                    if(typeName == 'object') {
+                                        if (Array.isArray(newObj[kk])) {//array
+                                            dataType = getSelectValue('array');
+                                        } else {//object
+                                            dataType = getSelectValue('object');
+                                        }
+                                    } else {
+                                        dataType = getSelectValue(typeName);
+                                    }
+                                    
+                                    var item = {
+                                        id: 0,
+                                        parentId: 0,
+                                        data_name: kk,
+                                        idx: 0,
+                                        data_type: dataType,
+                                        description: ''
+                                    };
+                                    addRespRow(newTableId, item);
+                                }
+                            }
+                            layer.close(index);
+                        } else {
+                            layer.alert("只能是json数据格式！")
+                        }
+                    }catch (e) {
+                        
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

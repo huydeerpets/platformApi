@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>基础数据</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--  IE10 viewport hack for Surface/desktop Windows 8 bug-->
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="/static/js/ie/html5shiv.js"></script>
+    <script src="/static/js/ie/respond.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="container text-center">
+        <form id="updateform" class="form-horizontal">
+            <input type="hidden" class="form-control" id="id" name="id" value="{{.baseData.Id}}">
+            <input type="hidden" class="form-control" id="langType" name="langType" value="{{.langType}}">
+            <div class="form-group">
+                <label for="dataType" class="col-sm-3 col-xs-3 control-label text-right">
+                    数据类型:
+                </label>
+                <div class="col-sm-4 col-xs-4">
+                    <select id="dataType" name="dataType" class="form-control">
+                        <option value="">-=请选择=-</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dataName" class="col-sm-3 col-xs-3 control-label text-right"><font color="red">*</font>名称:</label>
+                <div class="col-sm-9 col-xs-9">
+                    <input type="text" class="form-control" id="dataName" name="dataName" value="{{.baseData.DataName}}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dataCode" class="col-sm-3 col-xs-3 control-label text-right">
+                    <font color="red">*</font>代码:
+                </label>
+                <div class="col-sm-9 col-xs-9">
+                    <input type="text" class="form-control" id="dataCode" name="dataCode" value="{{.baseData.DataCode}}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dataDesc" class="col-sm-3 col-xs-3 control-label text-right">
+                    描述:
+                </label>
+                <div class="col-sm-9 col-xs-9">
+                    <textarea class="form-control" rows="6" id="dataDesc" name="dataDesc">{{.baseData.DataDesc}}</textarea>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <span id="returnMessage" class="glyphicon"> </span>
+                <button id="submitBtn" type="button" style="display:none;">确定</button>
+            </div>
+        </form>
+    </div>
+
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrapValidator.min.js"></script>
+
+    <script type='text/javascript'>
+        var form = $('#updateform');
+        $(document).ready(function () {
+            form.bootstrapValidator({
+                message: '输入值不合法',
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    dataName: {
+                        validators: {
+                            notEmpty: {
+                                message: '名称不能为空'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z0-9_\. \u4e00-\u9fa5 ]+$/,
+                                message: '名称只能由字母、数字、点、下划线和汉字组成'
+                            }
+                        }
+                    },
+                    dataCode: {
+                        validators: {
+                            notEmpty: {
+                                message: '代码不能为空'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 20,
+                                message: '请输入1到20个字符'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z0-9_\. \u4e00-\u9fa5 ]+$/,
+                                message: '名称只能由字母、数字、点、下划线和汉字组成'
+                            }
+                        }
+                    },
+                    dataDesc: {
+                        message: '描述不能为空',
+                        validators: {
+                            stringLength: {
+                                min: 2,
+                                max: 100,
+                                message: '请输入2到100个字符'
+                            }
+                        }
+                    }
+                    
+                }
+            });
+            loadRootBaseData();
+        });
+        
+        $("#submitBtn").click(function () {
+            //进行表单验证
+            var bv = form.data('bootstrapValidator');
+            bv.validate();
+            if (bv.isValid()) {
+                //发送ajax请求
+                $.ajax({
+                    url: '/BaseData/AddBaseData',
+                    async: false,//同步，会阻塞操作
+                    type: 'POST',//PUT DELETE POST
+                    data: form.serialize(),
+                    success: function (result) {
+                        if(result.Status==0) {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            var iframe = $(window.parent.document).find("iframe[name='iframe4']")[0];
+                            iframe.contentWindow.doSearch();
+                            iframe.contentWindow.loadRootBaseData();
+                            //1：勾号 2：X号 3：？号  4：锁  5：哭脸 6：笑脸 7：！号
+                            top.layer.msg('操作成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                            parent.layer.close(index);
+                        } else {
+                            top.layer.alert(result.Msg);
+                        }
+                    }, error: function () {
+                        top.layer.alert("网络异常，操作失败!");
+                    }
+                })
+            }
+        });
+        
+        function loadRootBaseData() {
+            $.ajax({
+                url: '/BaseData/GetBaseDataByType/0/'+$("#langType").val(),
+                async: false,//同步，会阻塞操作
+                type: 'GET',//PUT DELETE POST
+                success: function (result) {
+                    if (result.Status == 0) {
+                        for (var key in result.Data) {
+                            $("#dataType").append("<option value='" + key + "'>" + result.Data[key] + "</option>");
+                        }
+                        $("#dataType").val('{{.baseData.DataType}}');
+                    }
+                }, error: function () {
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

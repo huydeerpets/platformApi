@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>文档信息</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+
+    <!--  IE10 viewport hack for Surface/desktop Windows 8 bug-->
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="/static/js/ie/html5shiv.js"></script>
+    <script src="/static/js/ie/respond.js"></script>
+    <![endif]-->
+    <style type="text/css">
+        .tab-close {
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">文档信息</h4>
+            </div>
+            <div class="panel-body">
+                <form id="updateform" class="form-horizontal">
+                    <input type="hidden" id="pid" name="pid" value="{{.cate.Id}}" />
+                    <input type="hidden" id="full_path" name="full_path" value="{{.cate.FullPath}}" />
+                    <input type="hidden" id="depth" name="depth" value="{{.cate.Depth}}" />
+                    <input type="hidden" id="subCount" name="subCount" value="{{.subCount}}" />
+                    <input type="hidden" id="nodeLevel" name="nodeLevel" value="{{.nodeLevel}}" />
+                    <input type="hidden" id="attachAddr" name="attachAddr" value="{{.docCont.AttachAddr}}" />
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>标题:</label>
+                        <div class="col-sm-8 col-xs-8">
+                            <input type="text" class="form-control" id="name" name="name" value="{{.cate.Name}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="summary" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>简介:
+                        </label>
+                        <div class="col-sm-10 col-xs-10">
+                            <textarea style="resize:none;height:120px;" class="form-control" id="summary" name="summary">{{.docCont.Summary}}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="remark" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>内容:
+                        </label>
+                        <div class="col-sm-10 col-xs-10">
+                            <textarea style="resize:none;height:120px;" class="form-control" id="content" name="content">{{.docCont.Content}}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="code_file" class="col-sm-2 col-xs-2 control-label text-right">
+                            <font color="red">*</font>附件:
+                        </label>
+                        <div  class="col-sm-8 col-xs-8 text-left">
+                            <ul style="list-style-type:none;">
+                                <li id="showfile"></li>
+                                <li id="ossfile"></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-2 col-xs-2">
+                            <button type="button" class="btn btn-sm btn-primary" id="fileBtn">上传附件</button>
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <button id="submitBtn" type="button" style="display:none;">确定</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- 上传文件 -->
+        <div id="container" style="display: none;"></div>
+        <div id="container2" style="display: none;"></div>
+    </div>
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/layer/layer.js"></script>
+    <script src="/static/js/bootstrapValidator.min.js"></script>
+    
+    <script type="text/javascript" src="/static/js/plupload/moxie.js"></script>
+    <script type="text/javascript" src="/static/js/plupload/plupload.dev.js"></script>
+    <script type="text/javascript" src="/static/js/plupload/i18n/zh_CN.js"></script>
+    <script type="text/javascript" src="/static/js/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/static/js/ckeditor/insertCustomImage.js"></script>
+    <script type="text/javascript" src="/static/js/scripts/upload.js?v=1.2"></script>
+    <script type="text/javascript" src="/static/js/util.js"></script>
+    <script type="text/javascript" src="/static/js/upload_oss.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            var nodeLevel = $("#nodeLevel").val();
+            if(nodeLevel==3) {
+                $("#name").val('');
+            }
+            //$("#" + formId).find("textarea[name='HotelDetail']").val(row.HotelDetail);
+            initValidate();
+            
+            setFileContainerEvent();
+
+            createCkeditor('content');
+
+            setSubmitBtnEvent();
+
+            initUpload();
+
+            var attachAddr = $("#attachAddr").val();
+            if(attachAddr!="") {
+                $("#showfile").html('<a href="' + attachAddr + '" rel="nofollow" target="_blank">' + attachAddr + '</a>');
+            }
+        });
+
+        function initValidate() {
+            $("#updateform").bootstrapValidator({
+                message: '输入值不合法',
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    name: {
+                        validators: {
+                            notEmpty: {
+                                message: '标题不能为空'
+                            },
+                            stringLength: {
+                                min: 2,
+                                max: 100,
+                                message: '请输入1到20个字符'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setFileContainerEvent() {
+            $('#container').on(
+                'dragenter',
+                function (e) {
+                    e.preventDefault();
+                    $('#container').addClass('draging');
+                    e.stopPropagation();
+                }
+            ).on('drop', function (e) {
+                e.preventDefault();
+                $('#container').removeClass('draging');
+                e.stopPropagation();
+            }).on('dragleave', function (e) {
+                e.preventDefault();
+                $('#container').removeClass('draging');
+                e.stopPropagation();
+            }).on('dragover', function (e) {
+                e.preventDefault();
+                $('#container').addClass('draging');
+                e.stopPropagation();
+            });
+        }
+         //通过id创建ckeditor
+        function createCkeditor(textareaId) {
+            var editor = null;
+            if (CKEDITOR.instances[textareaId]) {
+                editor = CKEDITOR.instances[textareaId];
+                //销毁编辑器实例  
+                CKEDITOR.remove(editor);
+                //移除编辑器Jquery对象  
+                $('#cke_' + textareaId).remove();
+            }
+
+            if (CKEDITOR.instances[textareaId] == undefined) {
+                editor = CKEDITOR.replace(textareaId, {
+                    toolbar: [
+                        ['Cut', 'Copy', 'Paste'],
+                        ['Undo', 'Redo', '-', 'RemoveFormat'],
+                        ['Bold', 'Italic', 'Underline', 'Strike'],
+                        ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+                        ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak'],
+                        ['FontSize', 'TextColor', 'BGColor'],
+                        ['insertCustomImage'],
+                        ['NumberedList', 'BulletedList'],
+                        ['Link', 'Unlink'],
+                        ['Maximize', 'Source']
+                    ], height: '400px'
+                    , allowedContent: true
+                    , autoUpdateElement: true
+                });
+
+                //if ('{{.op}}' == 'view') {
+                //    $("#goodsDesc").attr("disabled", "disabled");
+                //}
+            }
+
+            //把富文本数据同步回textarea
+            /*
+            for (var instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+            CKEDITOR.config.readOnly = true;
+            */
+            CKEDITOR.on('instanceReady', function (e) {
+                if ('{{.op}}' != 'view') {
+                    initCKEditorUpload(editor);
+                } else {
+                    CKEDITOR.config.readOnly = true;
+                }
+            });
+        }
+        
+        function setSubmitBtnEvent() {
+            $("#submitBtn").click(function () {
+                var bv = $("#updateform").data('bootstrapValidator');
+                bv.validate();
+                if (!bv.isValid()) {
+                    return;
+                }
+                $("#content").val(CKEDITOR.instances.content.getData());
+                //CKEDITOR.replace('content');
+
+                var name = $("#name").val();
+                var summary = $("#summary").val();
+                var content = $("#content").val();
+
+                if (name == "") {
+                    showTips("标题不能为空！", "name");
+                    return;
+                }
+
+                if (summary == "") {
+                    showTips("简介不能为空！", "summary");
+                    return;
+                }
+
+                if (content == "") {
+                    showTips("内容不能为空！", "content");
+                    return;
+                }
+                
+                var url = '/DocCategory/SaveDocInfo';
+                if ($("#nodeLevel").val() == '4') {
+                    url = '/DocCategory/UpdateDocInfo';
+                }
+                //发送ajax请求
+                $.ajax({
+                    url: url,
+                    async: false,//同步，会阻塞操作
+                    type: 'POST',//PUT DELETE POST
+                    data: $("#updateform").serialize(),
+                    success: function (result) {
+                        if (result.Status == 0) {
+                            var index = parent.layer.getFrameIndex(window.name);
+
+                            var iframe = $(window.parent.document).find("iframe[name='iframe3']")[0];
+                            if ($("#nodeLevel").val() == '4') {
+                                iframe.contentWindow.setItemName($("#pid").val(), $("#name").val());
+                            } else {
+                                iframe.contentWindow.addNewItemExt($("#pid").val(), result.Data.Id, $("#name").val());
+                            }
+                            //1：勾号 2：X号 3：？号  4：锁  5：哭脸 6：笑脸 7：！号
+                            top.layer.msg('保存成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                            parent.layer.close(index);
+                        } else {
+                            top.layer.alert(result.Msg);
+                        }
+                    }, error: function () {
+                        top.layer.alert("网络异常，保存失败!");
+                    }
+                })
+            });
+        }
+        
+        function initUpload() {
+            g_object_name_type = 'random_name';
+            var options = {
+                btnSelfile: 'fileBtn',
+                containerId: 'container2',
+                ossfileId: 'ossfile',
+                multiSel: false,
+                uploadObjType:"3"
+            };
+            var uploader = new UploadOSS(options, function (fileName) {
+                //上传完后回调
+                $("#attachAddr").val(fileName);
+                $("#showfile").html('<a href="'+ fileName+'" rel="nofollow" target="_blank">' + fileName +'</a>');
+            });
+        }
+    </script>
+</body>
+</html>

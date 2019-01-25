@@ -1,0 +1,1533 @@
+swagger: "2.0"
+info:
+  title: platform API
+  description: 平台链官网相关api接口
+  version: 1.0.0
+  termsOfService: http://www.m-chain.com
+  contact:
+    email: 278985177@qq.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /v1
+paths:
+  /api/queryApiInfo/{id}:
+    get:
+      tags:
+      - api
+      description: 查询某接口的详情
+      operationId: ApiQueryController.查询某接口的详情
+      parameters:
+      - in: path
+        name: id
+        description: 接口ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ApiInfoResponse'
+  /api/queryApiTheme/{id}:
+    get:
+      tags:
+      - api
+      description: API主题查询
+      operationId: ApiQueryController.API主题查询
+      parameters:
+      - in: path
+        name: id
+        description: 接口ID
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ApiThemeResponse'
+  /chain/chainApply:
+    post:
+      tags:
+      - chain
+      description: 链申请
+      operationId: ChainController.链申请
+      parameters:
+      - in: formData
+        name: name
+        description: 链名称
+        required: true
+        type: string
+      - in: formData
+        name: en_short
+        description: 链英文简写名称
+        required: true
+        type: string
+      - in: formData
+        name: remark
+        description: 链简介
+        required: true
+        type: string
+      - in: formData
+        name: contact_name
+        description: 联系人姓名
+        required: true
+        type: string
+      - in: formData
+        name: contact_tel
+        description: 联系人电话
+        required: true
+        type: string
+      - in: formData
+        name: e_mail
+        description: 联系人邮箱
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+  /chain/chainApplyInfo/{id}:
+    get:
+      tags:
+      - chain
+      description: 链申请信息详情
+      operationId: ChainController.链申请信息详情
+      parameters:
+      - in: path
+        name: id
+        description: 主键ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ChainApplyResult'
+        "403":
+          description: :主键ID不能为空
+  /chain/chainSearch:
+    post:
+      tags:
+      - chain
+      description: 链索索
+      operationId: ChainController.链索索
+      parameters:
+      - in: formData
+        name: keyWord
+        description: 搜索关键字
+        type: string
+      - in: formData
+        name: page
+        description: 第几页
+        type: integer
+        format: int64
+      - in: formData
+        name: pageSize
+        description: 每页多少条记录
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ChainApplyListResult'
+        "403":
+          description: :搜索关键字不能为空
+  /chain/queryPublishCCRequireNum:
+    get:
+      tags:
+      - chain
+      description: 发布合约所需的平台币标准
+      operationId: ChainController.发布合约所需的平台币标准
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+  /chain/queryPublishTokenRequireNum:
+    get:
+      tags:
+      - chain
+      description: 发行token所需的平台币标准
+      operationId: ChainController.发行token所需的平台币标准
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+  /chain/queryReturnGasConfig:
+    get:
+      tags:
+      - chain
+      description: 手续费返还规则
+      operationId: ChainController.手续费返还规则
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ReturnGasConfigResponse'
+  /contract/queryContractInfo/{address}/{version}:
+    get:
+      tags:
+      - contract
+      description: 查询合约的详情
+      operationId: ContractController.queryContractInfo
+      parameters:
+      - in: path
+        name: address
+        description: 合约地址
+        required: true
+        type: string
+      - in: path
+        name: version
+        description: 合约版本号
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ContractResult'
+        "403":
+          description: :合约地址不能为空
+  /contract/queryContractList/{address}:
+    get:
+      tags:
+      - contract
+      description: 查询某个地址下的合约信息列表
+      operationId: ContractController.queryContractList
+      parameters:
+      - in: path
+        name: address
+        description: 钱包地址或合约地址
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.ContractListResult'
+        "403":
+          description: :钱包地址和合约地址必须二选其一
+  /doc/queryDocAllTheme:
+    get:
+      tags:
+      - doc
+      description: 获取新手指导所有主题信息
+      operationId: ApiDocController.获取新手指导所有主题信息
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.DocThemeListResult'
+  /doc/queryDocInfo/{id}:
+    get:
+      tags:
+      - doc
+      description: 获取文档详情
+      operationId: ApiDocController.获取文档详情
+      parameters:
+      - in: path
+        name: id
+        description: 文档记录ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.DocInfoResult'
+  /doc/queryDocTheme:
+    get:
+      tags:
+      - doc
+      description: 获取新手指导主题信息
+      operationId: ApiDocController.获取新手指导主题信息
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.DocThemeListResult'
+  /faq/queryFaqAllList:
+    get:
+      tags:
+      - faq
+      description: 查询所有的faq信息
+      operationId: ApiFaqController.queryFaqAllList
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.FaqListResult'
+  /faq/queryFaqInfo/{id}:
+    get:
+      tags:
+      - faq
+      description: 查询FAQ的详情
+      operationId: ApiFaqController.queryFaqInfo
+      parameters:
+      - in: path
+        name: id
+        description: faq记录ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.FaqResult'
+        "403":
+          description: :faq记录ID不能为空
+  /faq/queryFaqList:
+    get:
+      tags:
+      - faq
+      description: 查询faq列表信息
+      operationId: ApiFaqController.queryFaqList
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.FaqListResult'
+  /faq/queryTechnologyList:
+    post:
+      tags:
+      - faq
+      description: 技术问题搜索
+      operationId: ApiFaqController.queryTechnologyList
+      parameters:
+      - in: formData
+        name: keyWord
+        description: 搜索关键字
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.TechnologyListResult'
+        "403":
+          description: :搜索关键字不能为空
+  /question/addQuestion:
+    post:
+      tags:
+      - question
+      description: 问题反馈
+      operationId: ApiQuestionController.问题反馈
+      parameters:
+      - in: formData
+        name: email
+        description: 邮箱
+        required: true
+        type: string
+      - in: formData
+        name: title
+        description: 标题
+        required: true
+        type: string
+      - in: formData
+        name: question
+        description: 问题简介
+        required: true
+        type: string
+      - in: formData
+        name: baseUrl
+        description: 附件根url
+        type: string
+      - in: formData
+        name: attachName
+        description: 附件名称，多个以逗号分隔
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+  /sign/addSignData:
+    post:
+      tags:
+      - sign
+      description: 生成二维码的唯一标识
+      operationId: ApiSignController.Create
+      parameters:
+      - in: formData
+        name: signType
+        description: 签名类型 1、发布合约 2、实例化合约 3、升级合约 4、发行token 5、设置master、manager 6、manager签名确认
+          7、添加manager　8、替换manager 9 、删除manager 10、设置manager操作确认的阀值 11、设置发行token所需要的平台币
+          12、设置发布合约所需要的平台币 13、设置手续费返还规则 14、删除合约 15、设置master操作所需的确认数阀值 16、设置token图标
+        required: true
+        type: integer
+        format: int64
+      - in: formData
+        name: originData
+        description: 需要签名的原数据，上传附件时，直接传递到OSS上，将返回的文件地址与其它信息合并生成原始数据
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+        "403":
+          description: 只需要传递签名类型、待签名的原始数据即可
+  /sign/getSignStatus/{qrCode}:
+    get:
+      tags:
+      - sign
+      description: 查询签名是否成功
+      operationId: ApiSignController.Query
+      parameters:
+      - in: path
+        name: qrCode
+        description: 二维码标识
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.CCInvokeResult'
+        "403":
+          description: :二维码标识不能为空
+  /sign/querySignInfo/{qrCode}:
+    get:
+      tags:
+      - sign
+      description: 获取签名信息
+      operationId: ApiSignController.querySignInfo
+      parameters:
+      - in: path
+        name: qrCode
+        description: 二维码标识 9f9acb8f749b4f32b2e9dcab30601560
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.SignInfoResult'
+        "403":
+          description: :二维码标识不能为空
+  /token/isFirstSetMasterAndManager/{tokenID}:
+    get:
+      tags:
+      - token
+      description: 是否首次设置master和manager
+      operationId: TokenController.isFirstSetMasterAndManager
+      parameters:
+      - in: path
+        name: tokenID
+        description: token标识
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.JsonResult'
+        "403":
+          description: :token标识不能为空
+  /token/queryAllTokens:
+    get:
+      tags:
+      - token
+      description: 获取所有发行的token
+      operationId: TokenController.queryAllTokens
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.TokenItemListResult'
+  /token/queryTokenInfo/{tokenID}:
+    get:
+      tags:
+      - token
+      description: 查询token详情
+      operationId: TokenController.queryTokenInfo
+      parameters:
+      - in: path
+        name: tokenID
+        description: token标识
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.TokenResult'
+        "403":
+          description: :钱包地址不能为空
+  /token/queryTokenList:
+    post:
+      tags:
+      - token
+      description: 搜索token信息
+      operationId: TokenController.搜索token信息
+      parameters:
+      - in: formData
+        name: keyWord
+        description: 关键字
+        type: string
+      - in: formData
+        name: page
+        description: 第几页
+        type: integer
+        format: int64
+      - in: formData
+        name: pageSize
+        description: 每页多少条记录
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.TokenListResult'
+  /version/getVersionInfo/{platType}:
+    get:
+      tags:
+      - version
+      description: 获取某平台的版本信息
+      operationId: ApiVersionController.Get
+      parameters:
+      - in: path
+        name: platType
+        description: 平台类型(1、Android;2、IOS)
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/model.VersionResult'
+        "403":
+          description: :platType不能为空
+definitions:
+  model.ApiInfoResponse:
+    title: ApiInfoResponse
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.ApiMainInfo'
+        description: API详情
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.ApiMainInfo:
+    title: ApiMainInfo
+    type: object
+    properties:
+      RequestCodes:
+        description: 请求实例代码
+        type: array
+        items:
+          $ref: '#/definitions/model.RequestCode'
+      formParams:
+        description: 测试接口所需的表单参数
+        type: array
+        items:
+          $ref: '#/definitions/model.FormData'
+      id:
+        description: 接口ID
+        type: integer
+        format: int64
+      method:
+        description: 请求方法
+        type: string
+      name:
+        description: 接口名称
+        type: string
+      remark:
+        description: 接口说明
+        type: string
+      requestParams:
+        description: 接口请求所需参数
+        type: array
+        items:
+          $ref: '#/definitions/model.RequestParam'
+      requestParamsMemos:
+        description: 对某一请求参数的说明
+        type: array
+        items:
+          $ref: '#/definitions/model.RequestFieldData'
+      requestSamples:
+        description: 请求例子
+        type: array
+        items:
+          $ref: '#/definitions/model.RequestSample'
+      requestUrl:
+        description: 请求url
+        type: string
+      respParamResults:
+        description: 响应结果
+        type: array
+        items:
+          $ref: '#/definitions/model.RespParamResult'
+      respSamples:
+        description: 响应实例
+        type: array
+        items:
+          $ref: '#/definitions/model.ResponseSample'
+  model.ApiThemeItem:
+    title: ApiThemeItem
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      items:
+        description: 主题项
+        type: array
+        items:
+          $ref: '#/definitions/model.ApiThemeItem'
+      pid:
+        type: integer
+        format: int64
+      title:
+        description: 主题名称
+        type: string
+  model.ApiThemeResponse:
+    title: ApiThemeResponse
+    type: object
+    properties:
+      data:
+        description: API主题信息
+        type: array
+        items:
+          $ref: '#/definitions/model.ApiThemeItem'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.CCInvokeResult:
+    title: CCInvokeResult
+    type: object
+    properties:
+      contractAddress:
+        description: 合约地址
+        type: string
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+      tokenId:
+        description: token标识
+        type: string
+      txId:
+        description: 交易ID
+        type: string
+  model.ChainApplyInfo:
+    title: ChainApplyInfo
+    type: object
+    properties:
+      contact_name:
+        description: 联系人
+        type: string
+      contact_tel:
+        description: 联系电话
+        type: string
+      create_time:
+        description: 创建日期
+        type: string
+        format: string
+      createTimeFmt:
+        description: 格式化日期输出
+        type: string
+      e_mail:
+        description: 邮箱
+        type: string
+      en_short:
+        description: 链英文简称
+        type: string
+      id:
+        description: 记录ID
+        type: integer
+        format: int64
+      name:
+        description: 链中文名称
+        type: string
+      remark:
+        description: 备注
+        type: string
+      status:
+        description: 状态 1:线下沟通 2:入驻成功　3:入驻失败
+        type: integer
+        format: int64
+  model.ChainApplyListResult:
+    title: ChainApplyListResult
+    type: object
+    properties:
+      data:
+        description: token列表
+        type: array
+        items:
+          $ref: '#/definitions/model.ChainApplyInfo'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+      total:
+        description: 总记录数
+        type: integer
+        format: int64
+  model.ChainApplyResult:
+    title: ChainApplyResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.ChainApplyInfo'
+        description: token列表
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.Contract:
+    title: Contract
+    type: object
+    properties:
+      ccPath:
+        description: 合约路径
+        type: string
+      contractAddress:
+        description: 合约地址
+        type: string
+      contractSymbol:
+        description: 合约名称简写
+        type: string
+      createTime:
+        description: 合约发布时间
+        type: string
+      mAddress:
+        description: 钱包地址
+        type: string
+      name:
+        description: 合约名称
+        type: string
+      remark:
+        description: 合约简介
+        type: string
+      status:
+        description: 合约状态 -1、已删除 1、待初始化 2、正在运行 3、余额不足 4、合约已禁用 5、已弃用
+        type: string
+      updateTime:
+        description: 合约更新时间
+        type: string
+      version:
+        description: 版本号
+        type: string
+  model.ContractListResult:
+    title: ContractListResult
+    type: object
+    properties:
+      data:
+        description: 合约列表
+        type: array
+        items:
+          $ref: '#/definitions/model.Contract'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.ContractResult:
+    title: ContractResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.Contract'
+        description: 合约信息
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.DocContent:
+    title: DocContent
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      UpdateTimeFmt:
+        type: string
+      attachAddr:
+        description: 附件地址
+        type: string
+      cateId:
+        description: 分类ID
+        type: integer
+        format: int64
+      content:
+        description: 内容
+        type: string
+      createTime:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      status:
+        description: 状态　1:有效果 2:无效
+        type: integer
+        format: int64
+      summary:
+        description: 简介
+        type: string
+      title:
+        description: 标题
+        type: string
+      updateTime:
+        type: string
+        format: string
+  model.DocInfoResult:
+    title: DocInfoResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.DocContent'
+        description: 文档详情
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.DocThemeItem:
+    title: DocThemeItem
+    type: object
+    properties:
+      id:
+        description: 记录ID
+        type: integer
+        format: int64
+      summary:
+        description: 简介
+        type: string
+      title:
+        description: 标题
+        type: string
+  model.DocThemeListResult:
+    title: DocThemeListResult
+    type: object
+    properties:
+      data:
+        description: 文档主题列表
+        type: array
+        items:
+          $ref: '#/definitions/model.DocThemeItem'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.FaqListResult:
+    title: FaqListResult
+    type: object
+    properties:
+      data:
+        description: faq列表
+        type: array
+        items:
+          $ref: '#/definitions/model.FaqModel'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.FaqModel:
+    title: FaqModel
+    type: object
+    properties:
+      content:
+        description: 内容
+        type: string
+      createTime:
+        type: string
+        format: string
+      createTimeFmt:
+        type: string
+      id:
+        type: integer
+        format: int64
+      status:
+        description: 状态　1:有效果 2:无效
+        type: integer
+        format: int64
+      title:
+        description: 标题
+        type: string
+      updateTime:
+        type: string
+        format: string
+      updateTimeFmt:
+        type: string
+  model.FaqResult:
+    title: FaqResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.FaqModel'
+        description: faq详情
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.FieldItem:
+    title: FieldItem
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      createTime:
+        type: string
+        format: string
+      data_name:
+        description: 名称
+        type: string
+      data_type:
+        description: 数据类型
+        type: string
+      description:
+        description: 参数描述
+        type: string
+      fieldId:
+        description: 关联t_request_fields表ID
+        type: integer
+        format: int64
+      id:
+        type: integer
+        format: int64
+      is_require:
+        description: 是否必填
+        type: string
+      order_num:
+        description: 排序号
+        type: integer
+        format: int64
+      status:
+        description: 状态 1、启用 2、禁用
+        type: integer
+        format: int64
+  model.FormData:
+    title: FormData
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      createTime:
+        type: string
+        format: string
+      data_name:
+        description: 名称
+        type: string
+      data_type:
+        description: 数据类型
+        type: string
+      description:
+        description: 参数描述
+        type: string
+      id:
+        type: integer
+        format: int64
+      is_require:
+        description: 是否必填
+        type: string
+      order_num:
+        description: 排序号
+        type: integer
+        format: int64
+      status:
+        description: 状态 1、启用 2、禁用
+        type: integer
+        format: int64
+  model.JsonResult:
+    title: JsonResult
+    type: object
+    properties:
+      data:
+        description: 数据信息
+        type: string
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.RequestCode:
+    title: RequestCode
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      content:
+        description: 代码
+        type: string
+      createTime:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      langType:
+        description: 语言类型
+        type: string
+  model.RequestField:
+    title: RequestField
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: api接口分类ID
+        type: integer
+        format: int64
+      createTime:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      title:
+        description: 标题
+        type: string
+  model.RequestFieldData:
+    title: RequestFieldData
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/model.FieldItem'
+      reqFiled:
+        $ref: '#/definitions/model.RequestField'
+  model.RequestParam:
+    title: RequestParam
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      arg_name:
+        description: 参数名称
+        type: string
+      arg_type:
+        description: 请求参数类型
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      createTime:
+        type: string
+        format: string
+      data_type:
+        description: 数据类型
+        type: string
+      description:
+        description: 参数描述
+        type: string
+      id:
+        type: integer
+        format: int64
+      is_require:
+        description: 是否必填
+        type: string
+      order_num:
+        description: 排序号
+        type: integer
+        format: int64
+      status:
+        description: 状态 1、启用 2、禁用
+        type: integer
+        format: int64
+  model.RequestSample:
+    title: RequestSample
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      content:
+        description: 实例内容
+        type: string
+      createTime:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      title:
+        description: 实例标题
+        type: string
+  model.RespParamResult:
+    title: RespParamResult
+    type: object
+    properties:
+      respParams:
+        description: 响应结果
+        type: array
+        items:
+          $ref: '#/definitions/model.ResponseParam'
+      title:
+        description: 标题
+        type: string
+  model.ResponseParam:
+    title: ResponseParam
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      createTime:
+        type: string
+        format: string
+      data_name:
+        description: 名称
+        type: string
+      data_type:
+        description: 数据类型
+        type: string
+      description:
+        description: 参数描述
+        type: string
+      id:
+        type: integer
+        format: int64
+      idx:
+        description: 同一个父ID下索引相同的为一组元素
+        type: integer
+        format: int64
+      order_num:
+        description: 排序号
+        type: integer
+        format: int64
+      parentId:
+        description: 父ID
+        type: integer
+        format: int64
+      status:
+        description: 状态 1、启用 2、禁用
+        type: integer
+        format: int64
+  model.ResponseSample:
+    title: ResponseSample
+    type: object
+    properties:
+      CreateTimeFmt:
+        type: string
+      cateId:
+        description: API接口ID
+        type: integer
+        format: int64
+      content:
+        description: 内容
+        type: string
+      createTime:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      respType:
+        description: 响应类型
+        type: string
+  model.ReturnGasConfig:
+    title: ReturnGasConfig
+    type: object
+    properties:
+      initReleaseRatio:
+        description: 立即返还比例（按百分比）
+        type: string
+      interval:
+        description: 每次释放间隔时间以秒为单位
+        type: string
+      releaseRatio:
+        description: 释放比例（按百分比）
+        type: string
+  model.ReturnGasConfigResponse:
+    title: ReturnGasConfigResponse
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.ReturnGasConfig'
+        description: 数据信息
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.SignData:
+    title: SignData
+    type: object
+    properties:
+      address:
+        description: 钱包地址
+        type: string
+      createTime:
+        description: 生成二维码日期
+        type: string
+        format: string
+      createTimeFmt:
+        description: 日期格式化输出
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+        format: int64
+      originData:
+        description: 签名原始数据
+        type: string
+      pubKey:
+        description: 公钥
+        type: string
+      qrCode:
+        description: 二维码标识
+        type: string
+      respResult:
+        description: 底层链调用结果
+        type: string
+      signData:
+        description: 签名数据
+        type: string
+      signTime:
+        description: 签名日期
+        type: string
+        format: string
+      signTimeFmt:
+        description: 日期格式化输出
+        type: string
+      signType:
+        description: 签名类型 1、发布合约 2、实例化合约 3、升级合约 4、发行token 5、设置master、manager 6、manager签名确认
+          7、添加manager　8、替换manager 9 、删除manager 10、设置manager操作确认的阀值 11、设置发行token所需要的平台币
+          12、设置发布合约所需要的平台币 13、设置手续费返还规则 14、删除合约 15、设置master操作所需的确认数阀值 16、设置token图标
+        type: integer
+        format: int64
+      status:
+        description: 签名状态
+        type: integer
+        format: int64
+      validTime:
+        description: 有效时间戳
+        type: integer
+        format: int64
+  model.SignInfoResult:
+    title: SignInfoResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.SignData'
+        description: 签名数据
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.SignThemeInfo:
+    title: SignThemeInfo
+    type: object
+    properties:
+      managerAddresses:
+        description: manager地址
+        type: array
+        items:
+          type: string
+      managerCount:
+        description: manager个数
+        type: integer
+        format: int64
+      managerThreshold:
+        description: manager操作所需签名次数
+        type: integer
+        format: int64
+      masterAddress:
+        description: master地址
+        type: string
+      masterThreshold:
+        description: master操作所需签名次数
+        type: integer
+        format: int64
+  model.Technology:
+    title: Technology
+    type: object
+    properties:
+      ctype:
+        description: 内容类型　1:api文档 2:技术教程 3:FAQ
+        type: integer
+        format: int64
+      id:
+        type: integer
+        format: int64
+      pid:
+        description: 父ID
+        type: integer
+        format: int64
+      remark:
+        description: 描述
+        type: string
+      title:
+        description: 标题
+        type: string
+  model.TechnologyListResult:
+    title: TechnologyListResult
+    type: object
+    properties:
+      data:
+        description: 搜索结果
+        type: array
+        items:
+          $ref: '#/definitions/model.Technology'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.Token:
+    title: Token
+    type: object
+    properties:
+      decimalUnits:
+        description: 最大小数点位数
+        type: integer
+        format: int64
+      iconUrl:
+        description: token图标
+        type: string
+      isBaseCoin:
+        description: 是否主币
+        type: boolean
+      issuePrice:
+        description: 发行价
+        type: string
+      issueTime:
+        description: 发行时间
+        type: string
+      name:
+        description: token名称
+        type: string
+      ownerAddress:
+        description: token的发行者
+        type: string
+      restNumber:
+        description: 余额
+        type: string
+      status:
+        description: 状态　1、启用　0、禁用
+        type: integer
+        format: int64
+      tokenID:
+        description: token标识
+        type: string
+      tokenSymbol:
+        description: token名称简写
+        type: string
+      totalNumber:
+        description: 发行总量
+        type: string
+  model.TokenFlex:
+    title: TokenFlex
+    type: object
+    properties:
+      hasMutliSign:
+        description: 是否已设置多重签名
+        type: boolean
+      managerCount:
+        description: manager个数
+        type: integer
+        format: int64
+      managerThreshold:
+        description: manager相关操作所需的签名次数
+        type: integer
+        format: int64
+      masterThreshold:
+        description: master相关操作所需的签名次数
+        type: integer
+        format: int64
+      name:
+        description: token名称
+        type: string
+      status:
+        description: token状态　1、启用　0、禁用
+        type: integer
+        format: int64
+      tokenID:
+        description: token标识
+        type: string
+      tokenSymbol:
+        description: token名称简写
+        type: string
+  model.TokenItem:
+    title: TokenItem
+    type: object
+    properties:
+      name:
+        description: token名称
+        type: string
+      tokenId:
+        description: token标识
+        type: string
+      tokenSymbol:
+        description: token名称简写
+        type: string
+  model.TokenItemListResult:
+    title: TokenItemListResult
+    type: object
+    properties:
+      data:
+        description: token列表
+        type: array
+        items:
+          $ref: '#/definitions/model.TokenItem'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.TokenListResult:
+    title: TokenListResult
+    type: object
+    properties:
+      data:
+        description: token列表
+        type: array
+        items:
+          $ref: '#/definitions/model.TokenFlex'
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+      total:
+        description: 总记录数
+        type: integer
+        format: int64
+  model.TokenResult:
+    title: TokenResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.Token'
+        description: token信息
+      msg:
+        description: status为false时的错误信息
+        type: string
+      signInfo:
+        $ref: '#/definitions/model.SignThemeInfo'
+        description: 签名信息
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+  model.Version:
+    title: Version
+    type: object
+    properties:
+      appAddr:
+        description: 下载地址
+        type: string
+      appDesc:
+        description: app描述
+        type: string
+      appName:
+        description: app名称
+        type: string
+      createTime:
+        description: 创建时间
+        type: string
+        format: string
+      createTimeFmt:
+        type: string
+      id:
+        description: 记录ID
+        type: integer
+        format: int64
+      isCurrent:
+        description: 是否是当前版本 1、表示是 2、表示不是
+        type: integer
+        format: int64
+      platType:
+        description: 平台类型 1、andorid 2、Ios
+        type: integer
+        format: int64
+      size:
+        description: 文件大小
+        type: string
+      upgradeType:
+        description: 升级类型　1 、强制升级 2、可忽略
+        type: integer
+        format: int64
+      version:
+        description: 版本号
+        type: string
+  model.VersionResult:
+    title: VersionResult
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/model.Version'
+        description: 版本信息
+      msg:
+        description: status为false时的错误信息
+        type: string
+      status:
+        description: true 表示成功；false 表示失败
+        type: boolean
+tags:
+- name: sign
+  description: |
+    签名相关操作
+- name: contract
+  description: |
+    合约相关操作
+- name: token
+  description: |
+    token相关操作
+- name: chain
+  description: |
+    链相关操作
+- name: question
+  description: |
+    问题反馈相关操作
+- name: api
+  description: |
+    API查询相关操作
+- name: faq
+  description: |
+    FAQ相关操作
+- name: doc
+  description: |
+    相关文档查询接口
+- name: version
+  description: |
+    有关应用版本的相关操作

@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<HEAD>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>api分类</title>
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="STYLESHEET" type="text/css" href="/static/js/tree/dhtmlxtree.css">
+    <style type="text/css">
+        #treeboxbox_tree {
+            width: 35%;
+            /*设定宽度*/
+            height: 88%;
+            text-align: left;
+            /*文字左对齐*/
+            float: left;
+            /*不允许左侧存在浮动*/
+            overflow: auto;
+            /*超出宽度部分隐藏*/
+        }
+
+        #right {
+            width: 60%;
+            height: 88%;
+            text-align: left;
+            padding-left:20px;
+            padding-top:20px;
+            float: left;
+            /*不允许右侧存在浮动*/
+            overflow: auto;
+        }
+        #floater {
+            clear:both;
+        }
+        #saveBtn {
+            background-color: #008CBA;
+            border: none;
+            color: white;
+            padding: 5px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .form-control { 
+            display: block; 
+            width: 100%; 
+            height: 30px; 
+            padding: 6px 12px; 
+            font-size: 14px; 
+            line-height: 1.428571429; 
+            color: #555555; 
+            vertical-align: middle; 
+            background-color: #ffffff; 
+            border: 1px solid #cccccc; 
+            border-radius: 4px; 
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); 
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); 
+            -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; 
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; 
+        }        
+        .form-control:focus { 
+            border-color: #66afe9; 
+            outline: 0; 
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6); 
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6); 
+        } 
+
+    </style>
+    <script>
+        function validate(obj) {
+            var reg = new RegExp("^[0-9]*$");
+            if (!reg.test(obj.value)) {
+                alert("请输入数字!");
+                obj.focus();
+            }
+        }
+    </script>
+</head>
+
+<body style="overflow-x:hidden; margin-top:2px;">
+    <form metod="post">
+        <input type="hidden" id="id" name="id"/>
+        <div style="width:100%;padding-top:10px;">
+            <button type="button" style="margin-left: 200px;" id="langBtn" name="langBtn" class="btn btn-info btn-xs">切换到英文版本</button>
+        </div>
+
+        <div id="treeboxbox_tree"></div>
+
+        <div id="right">
+            <table style="font-size:13px;">
+                <tr>
+                    <td align="right">分类名称：</td>
+                    <td>
+                        <input type="text" class="form-control" style="width:200px;" id="name" name="name"/></td>
+                </tr>
+            </table>
+        </div>
+        <div id="floater" align="center">
+            <input name="saveBtn" id="saveBtn" type='button' value="保存" class="buttonGray" onclick='saveCategory()' />
+        </div>
+        
+    </form>
+    
+    <script src="/static/js/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/tree/dhtmlxcommon.js"></script>
+    <script src="/static/js/tree/dhtmlxtree.js"></script>
+
+    <script>
+        var langType = '{{.langType}}';
+        tree = new dhtmlXTreeObject("treeboxbox_tree", "100%", "100%", 0);
+        tree.setSkin('dhx_skyblue');
+        tree.setImagePath("/static/js/tree/imgs/csh_books/");
+        tree.enableAutoTooltips = true;
+        eval({{.tree}});
+        tree.setOnClickHandler(onNodeSelect);
+    
+        //根据id获取节点
+        //var node = _globalIdStorageFind(itemId)  
+        
+        setOpControls();
+
+        function setOpControls() {
+            var spans = $(".standartTreeRow").find("span")
+            spans.each(function () {
+                var itemId = $(this).attr("id");
+                var nodeLevel = tree.getLevel(itemId);
+                var text = $(this).text();
+                if (nodeLevel==4) {
+                    $(this).html(text + "<i class=\"fa fa-edit fa-lg\" style=\"margin-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"margin-left:8px;color:red\"></i><i class=\"fa fa-copy fa-lg\" style=\"padding-left:8px;\"></i>");
+                } else {
+                    $(this).html(text + "<i class=\"fa fa-plus-circle fa-lg\" style=\"margin-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"margin-left:8px;color:red\"></i>");
+                }
+                $(this).height(20);
+                $(this).css("font-size", "14px");
+            });
+
+            $("#langBtn").click(function () {
+                switchLangType();
+            });
+            if (langType == "1") {
+                $("#langBtn").html('切换到英文版');
+            } else if (langType == "2") {
+                $("#langBtn").html('切换到中文版');
+            }
+        }
+
+        function onNodeSelect(itemId) {
+            //var _count = tree.getSubItems(nodeId);
+            $.ajax({
+                type: 'get',
+                url: '/ApiCategory/GetCateInfo/'+itemId,
+                success: function (result) {
+                    if (result.Status == 0) {
+                        $("#id").val(result.Data.Id);
+                        $("#name").val(result.Data.Name);
+                    }
+                }, error: function () {
+                    top.layer.alert("获取API分类信息失败!");
+                }
+            })
+        }
+
+        function addNewItem(parentId,itemId,name) {
+            var tempStr = name + "<i class=\"fa fa-plus-circle fa-lg\" style=\"padding-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"padding-left:8px;color:red\"></i>";
+            tree.insertNewItem(parentId, itemId, tempStr, 0, 0, 0, 0, 'SELECT,CALL,TOP,CHILD,CHECKED');
+            
+            $("span#" + itemId).height(20);
+            $("span#" + itemId).css("font-size", "14px");
+            
+            var subIds = tree.getSubItems(parentId) + "";
+            var len = subIds.split(',').length;
+            for(var i = 1;i < len;i++)
+                tree.moveItem(itemId, 'down_strict');
+        }
+
+        function addNewItemExt(parentId, itemId, name) {
+            var tempStr = name + "<i class=\"fa fa-edit fa-lg\" style=\"padding-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"padding-left:8px;color:red\"></i><i class=\"fa fa-copy fa-lg\" style=\"padding-left:8px;\"></i>";
+            tree.insertNewItem(parentId, itemId, tempStr, 0, 0, 0, 0, 'SELECT,CALL,TOP,CHILD,CHECKED');
+
+            $("span#" + itemId).height(20);
+            $("span#" + itemId).css("font-size", "14px");
+
+            var subIds = tree.getSubItems(parentId) + "";
+            var len = subIds.split(',').length;
+            for (var i = 1; i < len; i++)
+                tree.moveItem(itemId, 'down_strict');
+        }
+
+        $("td").on("click", ".fa-plus-circle", function (e) {
+                e.stopPropagation();
+                var id = $($(this).parent()).attr("id");
+                tree.selectItem(id);
+                var subIds = tree.getSubItems(id) + "";
+                var subCount = 0;
+                if (subIds) {
+                    arr = subIds.split(",");
+                    subCount = arr.length;
+                }
+                var nodeLevel = tree.getLevel(id);//节点的层级数
+                var title = 'API分类';
+                var width = '40%';
+                var height = '32%';
+                if (nodeLevel==3) {
+                    title = 'API信息';
+                    width = '80%';
+                    height = '90%';
+                }
+                top.layer.open({
+                    type: 2,
+                    title: title,
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: [width, height],
+                    content: '/ApiCategory/InitCategory/' + id + '/' + subCount + '/'+ nodeLevel+'/'+ langType, //iframe的url
+                    btn: ['确定', '取消'],
+                    btn1: function (index, layero) {
+                        var btns = top.layer.getChildFrame('#submitBtn', index);
+                        $(btns[0]).click();
+                    }/*,
+                    end: function () {
+                        location.reload();
+                    }*/
+                });
+
+            });
+        $("td").on("click", ".fa-edit", function (e) {
+            e.stopPropagation();
+            var id = $($(this).parent()).attr("id");
+            tree.selectItem(id);
+
+            var title = 'API信息';
+            var width = '80%';
+            var height = '90%';
+            var nodeLevel = tree.getLevel(id);//节点的层级数
+            top.layer.open({
+                type: 2,
+                title: title,
+                shadeClose: true,
+                shade: 0.8,
+                area: [width, height],
+                content: '/ApiCategory/InitApiInfo/' + id +'/'+ nodeLevel+'/'+langType, //iframe的url
+                btn: ['确定', '取消'],
+                btn1: function (index, layero) {
+                    var btns = top.layer.getChildFrame('#submitBtn', index);
+                    $(btns[0]).click();
+                }/*,
+                end: function () {
+                    location.reload();
+                }*/
+            });
+
+        });
+
+        $("td").on("click", ".fa-times-circle", function (e) {
+                e.stopPropagation();
+                var id = $($(this).parent()).attr("id");
+                tree.selectItem(id);
+                if (tree.hasChildren(id)) {
+                    top.layer.msg('只有删除该分类下面的子类之后才能删除!', { icon: 5, shade: [0.6, '#393D49'], scrollbar: false, time: 2000 });
+                    return;
+                }
+                var nodeLevel = tree.getLevel(id);
+                top.layer.confirm('确定删除？', {
+                    btn: ['确定', '取消']//按钮
+                }, function (index) {
+                    top.layer.close(index);
+                    $.ajax({
+                        type: 'post',
+                        url: '/ApiCategory/DelCateInfo/',
+                        data: {
+                            id: id,
+                            orderNum: tree.getIndexById(id),
+                            pid: tree.getParentId(id),
+                            nodeLevel: nodeLevel
+                        },
+                        success: function (result) {
+                            if (result.Status == 0) {
+                                tree.deleteItem(id, false);
+                                top.layer.msg('删除成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                            } else {
+                                top.layer.alert(result.Msg);
+                            }
+                        }, error: function () {
+                            top.layer.alert("删除API分类信息失败!");
+                        }
+                    });
+                });
+            });
+        $("td").on("click", ".fa-copy", function (e) {
+            e.stopPropagation();
+            var id = $($(this).parent()).attr("id");
+            //tree.getItemText(id)
+            var name = $(".standartTreeRow").find("span[id='"+id+"']").text();
+            var nodeLevel = tree.getLevel(id);
+            var parentId = tree.getParentId(id);
+
+            top.layer.confirm('确定复制？', {
+                btn: ['确定', '取消']//按钮
+            }, function (index) {
+                top.layer.close(index);
+                $.ajax({
+                    type: 'post',
+                    url: '/ApiCategory/CopyCateInfo/',
+                    data: {
+                        id: id,
+                        orderNum: tree.getIndexById(id),
+                        pid: parentId,
+                        nodeLevel: nodeLevel
+                    },
+                    success: function (result) {
+                        if (result.Status == 0) {
+                            addNewItemExt(parentId, result.Data, name+" 副本");
+                            top.layer.msg('复制成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                        } else {
+                            top.layer.alert(result.Msg);
+                        }
+                    }, error: function () {
+                        top.layer.alert("复制信息失败!");
+                    }
+                });
+            });
+        });
+        
+        function switchLangType() {
+            if (langType == "1") {
+                langType = "2";
+            } else if (langType == "2") {
+                langType = "1";
+            }
+            var url = "/ApiCategory/List?menu_id={{.menu_id}}&langType=" + langType;
+            window.location.href = url;
+        }
+
+        function saveCategory() {
+             if($("#id").val()!="") {
+                 var id = $("#id").val();
+                 var name = $("#name").val();
+                 $.ajax({
+                     type: 'post',
+                     url: '/ApiCategory/UpdateCateInfo/',
+                     data:{
+                         id:id,
+                         name:name,
+                         orderNum: tree.getIndexById(id)
+                     },
+                     success: function (result) {
+                         if (result.Status == 0) {
+                             var tempStr = name + "<i class=\"fa fa-plus-circle fa-lg\" style=\"padding-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"padding-left:8px;color:red\"></i>";
+                             tree.setItemText(id, tempStr,"");
+                             top.layer.msg('修改成功。', { icon: 6, shade: [0.6, '#393D49'], scrollbar: false, time: 1000 });
+                         } else {
+                             top.layer.alert(result.Msg);
+                         }
+                     }, error: function () {
+                         top.layer.alert("保存API分类信息失败!");
+                     }
+                 });
+             }
+         }
+        
+        //删除权限
+        function deleteRight() {
+            var node = tree.getSelectedItemId();
+            var state = tree.getOpenState(node);
+            if (state != 0) {
+                alert("只能删除子节点!");
+                return;
+            }
+        }
+        function getItemLevel() {
+            var item_id = tree.getSelectedItemId();
+            return tree.getLevel(item_id);
+        }
+        function setItemName(id,name) {
+            var tempStr = name + "<i class=\"fa fa-edit fa-lg\" style=\"padding-left:6px;color:#1AAB62;\"></i><i class=\"fa fa-times-circle fa-lg\" style=\"padding-left:8px;color:red\"></i><i class=\"fa fa-copy fa-lg\" style=\"padding-left:8px;\"></i>";
+            tree.setItemText(id, tempStr, "");
+        }
+    </script>
+    
+
+</body>
+
+</html>
